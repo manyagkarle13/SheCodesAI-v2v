@@ -1,0 +1,40 @@
+# Virtual environments
+Backend/venv/
+Backend/env/
+Backend/.venv/
+venv/
+.venv/
+env/
+
+# Python cache and compiled files
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Django local configurations / databases
+Backend/db.sqlite3
+Backend/.env
+.env
+Backend/sakhipause_backend/local_settings.py
+
+# Frontend dependencies
+Frontend/node_modules/
+node_modules/
+
+# Production build outputs
+Frontend/dist/
+dist/
+
+# IDE / Editor configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
