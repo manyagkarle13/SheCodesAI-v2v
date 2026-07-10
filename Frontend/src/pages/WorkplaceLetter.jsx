@@ -32,12 +32,17 @@ export default function WorkplaceLetter() {
         }),
       })
 
-      if (!response.ok) {
-        const errData = await response.json()
-        throw new Error(errData.message || 'Failed to generate letter.')
+      let data = {}
+      try {
+        data = await response.json()
+      } catch (e) {
+        throw new Error('Failed to parse response data. Please try again.')
       }
 
-      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.message || data.detail || 'Failed to generate workplace letter.')
+      }
+
       setLetter(data.letter)
       setGenerated(true)
     } catch (err) {
@@ -78,6 +83,7 @@ export default function WorkplaceLetter() {
                 value={jobRole}
                 onChange={(e) => setJobRole(e.target.value)}
                 placeholder="e.g. Senior Marketing Manager, Software Engineer, Teacher..."
+                maxLength={100}
                 className="w-full px-5 py-3.5 rounded-2xl border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm bg-[#FAF0ED]/20 placeholder-accent/30"
               />
             </div>
@@ -91,6 +97,7 @@ export default function WorkplaceLetter() {
                 value={concerns}
                 onChange={(e) => setConcerns(e.target.value)}
                 placeholder="e.g. I need flexibility to work from home 2 days a week, access to a cool/quiet space, or adjusted meeting hours..."
+                maxLength={1000}
                 className="w-full px-5 py-4 rounded-2xl border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm bg-[#FAF0ED]/20 resize-none placeholder-accent/30"
               ></textarea>
             </div>

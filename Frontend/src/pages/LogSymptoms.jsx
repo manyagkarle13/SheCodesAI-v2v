@@ -51,6 +51,7 @@ export default function LogSymptoms() {
     if (!token?.access) return
     const checkTodayLog = async () => {
       try {
+        setError('')
         const res = await fetch(`${import.meta.env.VITE_API_URL}/symptoms/history/`, {
           headers: { Authorization: `Bearer ${token.access}` },
         })
@@ -68,9 +69,12 @@ export default function LogSymptoms() {
             setSymptoms(prefilled)
             setNotes(todayLog.notes || '')
           }
+        } else {
+          throw new Error('Failed to retrieve logged symptom history.')
         }
       } catch (err) {
         console.error('Could not check existing log:', err)
+        setError("Failed to check today's symptom log history. Please check your connection.")
       } finally {
         setLoadingExisting(false)
       }
@@ -115,10 +119,27 @@ export default function LogSymptoms() {
         body: JSON.stringify({ ...symptoms, notes }),
       })
 
-      const responseData = await response.json()
+      let responseData = {}
+      try {
+        responseData = await response.json()
+      } catch (e) {
+        // Not JSON
+      }
 
       if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to save symptom log. Please try again.')
+        let errorMessage = 'Failed to save symptom log. Please try again.'
+        if (responseData.message) {
+          errorMessage = responseData.message
+        } else if (responseData.detail) {
+          errorMessage = responseData.detail
+        } else if (responseData.errors) {
+          const errorKeys = Object.keys(responseData.errors)
+          if (errorKeys.length > 0) {
+            const firstError = responseData.errors[errorKeys[0]]
+            errorMessage = Array.isArray(firstError) ? firstError[0] : firstError
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       setSuccess(true)

@@ -26,7 +26,7 @@ function Sparkline({ data }) {
   )
 
   const W = 320, H = 80, padX = 10, padY = 8
-  const values = data.map(d => d.avg_mrs_score || 0)
+  const values = data.map(d => d.avg_score || 0)
   const maxV = Math.max(...values, 1)
   const minV = Math.min(...values, 0)
   const range = maxV - minV || 1
@@ -114,11 +114,13 @@ export default function Dashboard() {
   const [loadingScore, setLoadingScore] = useState(true)
   const [loadingTrends, setLoadingTrends] = useState(true)
   const [quickMessage, setQuickMessage] = useState('')
+  const [error, setError] = useState('')
 
   const today = new Date().toISOString().split('T')[0]
 
   useEffect(() => {
     if (!token?.access) return
+    setError('')
 
     // Fetch MRS score
     const fetchScore = async () => {
@@ -133,9 +135,12 @@ export default function Dashboard() {
             setLatestLog(data.latest_log)
             setTodayLogged(data.latest_log.date === today)
           }
+        } else if (res.status !== 404) {
+          throw new Error('Failed to retrieve daily score summary.')
         }
       } catch (e) {
         console.error(e)
+        setError('Could not retrieve daily symptom score. Please refresh or try again later.')
       } finally {
         setLoadingScore(false)
       }
@@ -149,10 +154,13 @@ export default function Dashboard() {
         })
         if (res.ok) {
           const data = await res.json()
-          setTrendsData(data.weekly_trends || [])
+          setTrendsData(data.trends || [])
+        } else {
+          throw new Error('Failed to retrieve symptoms weekly trends.')
         }
       } catch (e) {
         console.error(e)
+        setError('Could not retrieve trend analytics. Please refresh or try again later.')
       } finally {
         setLoadingTrends(false)
       }
@@ -194,6 +202,12 @@ export default function Dashboard() {
         </h1>
         <p className="text-accent/50 text-sm mt-1">Here's your health snapshot for today.</p>
       </div>
+
+      {error && (
+        <div className="bg-[#FAF0ED] border border-primary/20 text-primary text-sm rounded-2xl p-4 mb-6 font-medium">
+          ⚠️ {error}
+        </div>
+      )}
 
       {/* ── ROW 1: MRS Score + Log Today ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">

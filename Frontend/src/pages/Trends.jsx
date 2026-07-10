@@ -176,6 +176,8 @@ export default function Trends() {
         if (scoreRes.ok) {
           scoreJson = await scoreRes.json()
           setScoreData(scoreJson)
+        } else if (scoreRes.status !== 404) {
+          throw new Error('Failed to retrieve daily symptom score.')
         }
 
         // 2. Fetch weekly trend data
@@ -183,6 +185,8 @@ export default function Trends() {
         if (trendsRes.ok) {
           const trendsJson = await trendsRes.json()
           setTrends(trendsJson.trends || [])
+        } else {
+          throw new Error('Failed to retrieve symptoms weekly trends.')
         }
 
         if (!scoreRes.ok && scoreRes.status === 404) {

@@ -26,15 +26,26 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (email, password) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
+    let response
+    try {
+      response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+    } catch (err) {
+      throw new Error('Connection failed. Please check your network and try again.')
+    }
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.detail || 'Login failed. Please check your credentials.')
+      let errorMessage = 'Login failed. Please check your credentials.'
+      try {
+        const errorData = await response.json()
+        errorMessage = errorData.detail || errorData.message || errorMessage
+      } catch (e) {
+        // Fallback if response is not JSON
+      }
+      throw new Error(errorMessage)
     }
 
     const data = await response.json()
@@ -58,20 +69,30 @@ export const AuthProvider = ({ children }) => {
     }
     if (age) payload.age = parseInt(age, 10)
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
+    let response
+    try {
+      response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+    } catch (err) {
+      throw new Error('Connection failed. Please check your network and try again.')
+    }
 
     if (!response.ok) {
-      const errorData = await response.json()
-      const errorKeys = Object.keys(errorData)
-      if (errorKeys.length > 0) {
-        const firstError = errorData[errorKeys[0]]
-        throw new Error(Array.isArray(firstError) ? firstError[0] : firstError)
+      let errorMessage = 'Registration failed. Please check the form details.'
+      try {
+        const errorData = await response.json()
+        const errorKeys = Object.keys(errorData)
+        if (errorKeys.length > 0) {
+          const firstError = errorData[errorKeys[0]]
+          errorMessage = Array.isArray(firstError) ? firstError[0] : firstError
+        }
+      } catch (e) {
+        // Fallback if response is not JSON
       }
-      throw new Error('Registration failed. Please check the form details.')
+      throw new Error(errorMessage)
     }
 
     const data = await response.json()

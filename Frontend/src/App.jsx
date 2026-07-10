@@ -31,6 +31,22 @@ function LandingPage() {
   const handleModalSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    // JavaScript form validations for Signup
+    if (modalTab === 'signup') {
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long.')
+        return
+      }
+      if (age !== '') {
+        const numAge = parseInt(age, 10)
+        if (isNaN(numAge) || numAge < 1 || numAge > 120) {
+          setError('Please enter a realistic age between 1 and 120.')
+          return
+        }
+      }
+    }
+
     setIsSubmitting(true)
     try {
       if (modalTab === 'signup') {
@@ -179,7 +195,7 @@ function LandingPage() {
         <img
           src="/hero_illustration.jpg"
           alt="Sakhi background illustration"
-          className="absolute inset-0 w-full h-full object-cover object-right pointer-events-none z-0 mix-blend-multiply opacity-90"
+          className="absolute inset-0 w-full h-full object-cover object-right pointer-events-none z-0 mix-blend-multiply opacity-25 md:opacity-90"
         />
 
         {/* Content Overlay */}
@@ -572,6 +588,7 @@ function LandingPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
+                      minLength={modalTab === 'signup' ? 8 : undefined}
                       className="w-full px-4 pr-10 py-3 rounded-full border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm bg-cream/40"
                     />
                     <button

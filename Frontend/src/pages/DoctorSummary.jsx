@@ -22,12 +22,17 @@ export default function DoctorSummary() {
         },
       })
 
-      if (!response.ok) {
-        const errData = await response.json()
-        throw new Error(errData.message || 'Failed to generate visit summary.')
+      let data = {}
+      try {
+        data = await response.json()
+      } catch (e) {
+        throw new Error('Failed to parse report data. Please try again.')
       }
 
-      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.message || data.detail || 'Failed to generate visit summary.')
+      }
+
       setReport(data)
     } catch (err) {
       console.error(err)

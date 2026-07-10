@@ -2,6 +2,78 @@ import { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+// Simple pure-React markdown text formatter for formatting paragraphs, bullets, and bold inline texts
+function FormattedText({ text }) {
+  if (!text) return null
+
+  // Split text by lines to support paragraph separation and lists
+  const lines = text.split('\n')
+  const elements = []
+  let currentList = []
+
+  const flushList = (key) => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={key} className="list-disc pl-5 my-2 space-y-1">
+          {currentList}
+        </ul>
+      )
+      currentList = []
+    }
+  }
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim()
+    if (!trimmed) {
+      flushList(`list-${idx}`)
+      return
+    }
+
+    // Check if line starts with a list bullet character: '-' or '*'
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      const content = trimmed.substring(2).trim()
+      currentList.push(
+        <li key={`li-${idx}`}>
+          {renderBoldText(content)}
+        </li>
+      )
+    } else if (trimmed.startsWith('-') || trimmed.startsWith('*')) {
+      const content = trimmed.substring(1).trim()
+      currentList.push(
+        <li key={`li-${idx}`}>
+          {renderBoldText(content)}
+        </li>
+      )
+    } else {
+      flushList(`list-${idx}`)
+      elements.push(
+        <p key={`p-${idx}`} className="mb-2 leading-relaxed">
+          {renderBoldText(trimmed)}
+        </p>
+      )
+    }
+  })
+
+  // Flush any remaining list elements
+  flushList('list-end')
+
+  return <div className="space-y-1">{elements}</div>
+}
+
+function renderBoldText(text) {
+  // Split by bold regex to format text inside ** or *
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g)
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={idx} className="font-bold">{part.slice(2, -2)}</strong>
+    }
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <strong key={idx} className="font-bold">{part.slice(1, -1)}</strong>
+    }
+    return part
+  })
+}
+
 export default function AskAI() {
   const { token } = useAuth()
   const location = useLocation()
@@ -48,10 +120,12 @@ export default function AskAI() {
           // If no sessions, create a default one
           handleNewChat()
         }
+      } else {
+        throw new Error('Failed to retrieve chat sessions.')
       }
     } catch (err) {
       console.error('Error fetching sessions:', err)
-      setError('Could not load chat history.')
+      setError('Could not load chat history. Please verify your connection.')
     } finally {
       setLoadingSessions(false)
     }
@@ -72,11 +146,11 @@ export default function AskAI() {
         const data = await response.json()
         setMessages(data.messages || [])
       } else {
-        setError('Failed to load messages.')
+        throw new Error('Failed to load session messages.')
       }
     } catch (err) {
       console.error('Error fetching messages:', err)
-      setError('Could not load message history.')
+      setError('Could not load message history. Please try again.')
     } finally {
       setLoadingMessages(false)
     }
@@ -121,11 +195,11 @@ export default function AskAI() {
           }
         ])
       } else {
-        setError('Failed to start a new chat.')
+        throw new Error('Failed to start a new chat.')
       }
     } catch (err) {
       console.error('Error creating session:', err)
-      setError('Could not create new session.')
+      setError('Could not create new chat session. Please try again.')
     } finally {
       setLoadingMessages(false)
     }
@@ -145,9 +219,9 @@ export default function AskAI() {
     setIsSubmitting(true)
 
     try {
-      // Send the last few messages for contextual query processing
-      // Filter out greeting so we don't blow up context size if unnecessary
-      const apiMessages = updatedMessages.map((msg) => ({
+      // Keep only the last 6 messages to save Groq token context usage
+      const lastMessages = updatedMessages.slice(-6)
+      const apiMessages = lastMessages.map((msg) => ({
         role: msg.role,
         content: msg.content,
       }))
@@ -165,11 +239,19 @@ export default function AskAI() {
       })
 
       if (!response.ok) {
-        const errData = await response.json()
+        let errData = {}
+        try {
+          errData = await response.json()
+        } catch (e) {}
         throw new Error(errData.message || 'AI service encountered an issue.')
       }
 
-      const data = await response.json()
+      let data = {}
+      try {
+        data = await response.json()
+      } catch (e) {
+        throw new Error('AI service returned an invalid response.')
+      }
       
       // Append AI response to messages list
       setMessages((prev) => [
@@ -200,15 +282,16 @@ export default function AskAI() {
   }
 
   return (
-    <div className="min-h-full py-6 px-4 md:px-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-6 h-[calc(100svh-4.5rem)] md:h-[calc(100vh-2rem)]">
+    <div className="min-h-full py-6 px-4 md:px-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-6 h-[calc(100svh-8.5rem)] md:h-[calc(100vh-2rem)]">
 
       {/* ── SESSIONS LIST SIDEBAR (Desktop) ── */}
-      <div className="hidden md:flex flex-col w-64 bg-white rounded-3xl border border-primary/5 shadow-md overflow-hidden h-full">
+      <div className="hidden md:flex flex-col w-64 shrink-0 bg-white rounded-3xl border border-primary/5 shadow-md overflow-hidden h-full">
         <div className="p-4 border-b border-primary/5 flex items-center justify-between">
           <span className="text-xs font-bold text-accent/50 uppercase tracking-wider">Chat History</span>
           <button
             onClick={handleNewChat}
-            className="text-xs font-bold text-primary hover:bg-primary/5 px-2.5 py-1.5 rounded-full border border-primary/20 transition-all cursor-pointer"
+            disabled={loadingSessions || loadingMessages || isSubmitting}
+            className="text-xs font-bold text-primary hover:bg-primary/5 px-2.5 py-1.5 rounded-full border border-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             + New Chat
           </button>
@@ -228,7 +311,8 @@ export default function AskAI() {
               <button
                 key={session.id}
                 onClick={() => selectSession(session.id)}
-                className={`w-full text-left p-3 rounded-2xl transition-all text-xs font-semibold cursor-pointer block ${
+                disabled={loadingSessions || loadingMessages || isSubmitting}
+                className={`w-full text-left p-3 rounded-2xl transition-all text-xs font-semibold cursor-pointer block disabled:opacity-75 disabled:cursor-not-allowed ${
                   activeSessionId === session.id
                     ? 'bg-primary/10 text-primary'
                     : 'text-accent/70 hover:bg-accent/5 hover:text-accent'
@@ -256,7 +340,8 @@ export default function AskAI() {
 
         <button
           onClick={handleNewChat}
-          className="text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 transition-all cursor-pointer"
+          disabled={loadingSessions || loadingMessages || isSubmitting}
+          className="text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           + New Chat
         </button>
@@ -336,7 +421,7 @@ export default function AskAI() {
                         : 'bg-[#FAF0ED] text-accent rounded-tl-none border border-primary/5'
                     }`}
                   >
-                    {msg.content}
+                    <FormattedText text={msg.content} />
                   </div>
                 </div>
               )
@@ -376,6 +461,7 @@ export default function AskAI() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask me about symptoms, guidelines, or templates..."
             disabled={isSubmitting || loadingMessages}
+            maxLength={1000}
             className="flex-grow px-5 py-3.5 rounded-full border border-primary/20 text-sm bg-cream/20 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-accent/40 disabled:opacity-50"
           />
           <button
