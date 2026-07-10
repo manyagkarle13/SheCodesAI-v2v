@@ -78,11 +78,13 @@ function LandingPage() {
     <div className="min-h-screen bg-cream text-accent font-sans selection:bg-primary/20 selection:text-primary">
 
       {/* NAVBAR */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-cream/80 border-b border-primary/5 transition-all duration-300">
-        <nav className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between relative">
+      <header className="sticky top-0 z-50 w-full bg-transparent py-4 px-4 md:px-8 transition-all duration-300">
+        <nav className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between relative backdrop-blur-md bg-white/70 border border-primary/10 rounded-2xl md:rounded-full shadow-md">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <Link to="/" className="text-2xl font-bold tracking-tight text-primary">Sakhi</Link>
+            <Link to="/" className="text-2xl font-bold tracking-tight text-primary">
+              Sakhi <span className="font-light">Pause</span>
+            </Link>
           </div>
 
           {/* Center Nav Links */}
