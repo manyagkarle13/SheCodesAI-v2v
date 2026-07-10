@@ -22,7 +22,7 @@ def health_check(request):
     """
     return Response({
         "status": "ok",
-        "message": "SakhiPause API is running successfully."
+        "message": "SakhiPause API is running successfully. Version 2."
     }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
