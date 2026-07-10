@@ -4,7 +4,7 @@ from .views import (
     health_check, register_user, MyTokenObtainPairView,
     log_symptom, update_symptom_log, get_symptom_history,
     get_mrs_score, get_symptom_trends,
-    chat_sessions, chat_session_messages, ask_ai,
+    chat_sessions, chat_session_messages, delete_chat_session, ask_ai,
     get_doctor_summary, generate_workplace_letter
 )
 
@@ -22,6 +22,7 @@ urlpatterns = [
     # Chat
     path('chat/sessions/', chat_sessions, name='chat_sessions'),
     path('chat/sessions/<int:session_id>/messages/', chat_session_messages, name='chat_session_messages'),
+    path('chat/sessions/<int:session_id>/delete/', delete_chat_session, name='delete_chat_session'),
     path('chat/ask/', ask_ai, name='ask_ai'),
     # Reports
     path('summary/doctor-report/', get_doctor_summary, name='doctor_report'),

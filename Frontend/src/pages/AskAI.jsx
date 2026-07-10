@@ -268,7 +268,36 @@ export default function AskAI() {
       setIsSubmitting(false)
     }
   }
-
+  const handleDeleteSession = async (sessionId) => {
+    if (!token?.access || !window.confirm('Are you sure you want to delete this chat session?')) return
+    setError('')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat/sessions/${sessionId}/delete/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token.access}`,
+        },
+      })
+      if (response.ok) {
+        const remaining = sessions.filter((s) => s.id !== sessionId)
+        setSessions(remaining)
+        
+        if (activeSessionId === sessionId) {
+          if (remaining.length > 0) {
+            setActiveSessionId(remaining[0].id)
+            fetchMessages(remaining[0].id)
+          } else {
+            handleNewChat()
+          }
+        }
+      } else {
+        throw new Error('Failed to delete chat session.')
+      }
+    } catch (err) {
+      console.error('Delete chat error:', err)
+      setError('Could not delete the chat session. Please try again.')
+    }
+  }
   const selectSession = (id) => {
     setActiveSessionId(id)
     fetchMessages(id)
@@ -308,19 +337,34 @@ export default function AskAI() {
             <div className="p-4 text-center text-xs text-accent/40">No conversations yet.</div>
           ) : (
             sessions.map((session) => (
-              <button
-                key={session.id}
-                onClick={() => selectSession(session.id)}
-                disabled={loadingSessions || loadingMessages || isSubmitting}
-                className={`w-full text-left p-3 rounded-2xl transition-all text-xs font-semibold cursor-pointer block disabled:opacity-75 disabled:cursor-not-allowed ${
-                  activeSessionId === session.id
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-accent/70 hover:bg-accent/5 hover:text-accent'
-                }`}
-              >
-                <div className="truncate font-bold mb-0.5">{session.title}</div>
-                <div className="text-[10px] text-accent/40">{formatDate(session.updated_at)}</div>
-              </button>
+              <div key={session.id} className="relative group">
+                <button
+                  onClick={() => selectSession(session.id)}
+                  disabled={loadingSessions || loadingMessages || isSubmitting}
+                  className={`w-full text-left p-3 pr-8 rounded-2xl transition-all text-xs font-semibold cursor-pointer block disabled:opacity-75 disabled:cursor-not-allowed ${
+                    activeSessionId === session.id
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-accent/70 hover:bg-accent/5 hover:text-accent'
+                  }`}
+                >
+                  <div className="truncate font-bold mb-0.5 pr-2">{session.title}</div>
+                  <div className="text-[10px] text-accent/40">{formatDate(session.updated_at)}</div>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteSession(session.id)
+                  }}
+                  disabled={loadingSessions || loadingMessages || isSubmitting}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-accent/30 hover:text-rose-600 hover:bg-rose-50 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Delete chat"
+                  title="Delete chat"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             ))
           )}
         </div>
@@ -362,18 +406,31 @@ export default function AskAI() {
             </div>
             <div className="flex-grow overflow-y-auto space-y-1.5 pb-6">
               {sessions.map((session) => (
-                <button
-                  key={session.id}
-                  onClick={() => selectSession(session.id)}
-                  className={`w-full text-left p-3.5 rounded-2xl transition-all text-xs font-semibold cursor-pointer block ${
-                    activeSessionId === session.id
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-accent/70 hover:bg-accent/5'
-                  }`}
-                >
-                  <div className="truncate font-bold mb-0.5">{session.title}</div>
-                  <div className="text-[10px] text-accent/40">{formatDate(session.updated_at)}</div>
-                </button>
+                <div key={session.id} className="relative group">
+                  <button
+                    onClick={() => selectSession(session.id)}
+                    className={`w-full text-left p-3.5 pr-10 rounded-2xl transition-all text-xs font-semibold cursor-pointer block ${
+                      activeSessionId === session.id
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-accent/70 hover:bg-accent/5'
+                    }`}
+                  >
+                    <div className="truncate font-bold mb-0.5 pr-2">{session.title}</div>
+                    <div className="text-[10px] text-accent/40">{formatDate(session.updated_at)}</div>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteSession(session.id)
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-accent/40 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                    aria-label="Delete chat"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               ))}
             </div>
           </div>

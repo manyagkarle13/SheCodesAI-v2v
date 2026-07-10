@@ -230,6 +230,21 @@ def chat_session_messages(request, session_id):
     return Response({"status": "success", "messages": serializer.data, "title": session.title}, status=status.HTTP_200_OK)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_chat_session(request, session_id):
+    """
+    DELETE: Delete a chat session and all its messages.
+    """
+    try:
+        session = ChatSession.objects.get(id=session_id, user=request.user)
+    except ChatSession.DoesNotExist:
+        return Response({"status": "error", "message": "Chat session not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    session.delete()
+    return Response({"status": "success", "message": "Chat session deleted successfully."}, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ask_ai(request):
