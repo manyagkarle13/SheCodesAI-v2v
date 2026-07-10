@@ -5,7 +5,8 @@ from .views import (
     log_symptom, update_symptom_log, get_symptom_history,
     get_mrs_score, get_symptom_trends,
     chat_sessions, chat_session_messages, delete_chat_session, ask_ai,
-    get_doctor_summary, generate_workplace_letter
+    get_doctor_summary, get_doctor_summary_history,
+    generate_workplace_letter, get_workplace_letter_history
 )
 
 urlpatterns = [
@@ -26,5 +27,7 @@ urlpatterns = [
     path('chat/ask/', ask_ai, name='ask_ai'),
     # Reports
     path('summary/doctor-report/', get_doctor_summary, name='doctor_report'),
+    path('summary/history/', get_doctor_summary_history, name='doctor_summary_history'),
     path('workplace/generate-letter/', generate_workplace_letter, name='generate_workplace_letter'),
+    path('workplace/history/', get_workplace_letter_history, name='workplace_letter_history'),
 ]

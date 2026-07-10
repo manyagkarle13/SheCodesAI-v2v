@@ -161,7 +161,9 @@ export default function AppLayout({ children }) {
   )
 
   return (
-    <div className="flex min-h-screen bg-cream text-accent font-sans selection:bg-primary/20 selection:text-primary">
+    <div className="flex min-h-screen bg-cream text-accent font-sans selection:bg-primary/20 selection:text-primary pt-[3px]">
+      {/* Top clinical accent border */}
+      <div className="fixed top-0 left-0 right-0 h-[3px] bg-primary z-50" />
 
       {/* ── Desktop Sidebar (fixed left) ── */}
       <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 bg-white border-r border-primary/5 z-30 shadow-sm">

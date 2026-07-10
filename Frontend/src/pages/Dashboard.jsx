@@ -174,7 +174,7 @@ export default function Dashboard() {
     ? SCORE_STYLES[scoreData.classification] || SCORE_STYLES['Moderate']
     : null
 
-  const trendMeta = scoreData?.trend ? TREND_META[scoreData.trend] : null
+  const trendMeta = scoreData?.trend?.direction ? TREND_META[scoreData.trend.direction] : null
 
   const handleQuickChat = (e) => {
     e.preventDefault()
@@ -234,7 +234,7 @@ export default function Dashboard() {
           ) : scoreData ? (
             <>
               <div className="flex items-end gap-3 mb-4">
-                <span className="text-6xl font-black text-accent leading-none">{scoreData.score}</span>
+                <span className="text-6xl font-black text-accent leading-none">{scoreData.latest_score}</span>
                 <span className="text-accent/30 text-sm pb-2 font-semibold">/ 44</span>
               </div>
               {scoreStyle && (
@@ -356,78 +356,94 @@ export default function Dashboard() {
       </div>
 
       {/* ── ROW 3: Ask AI + Quick Links ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 items-stretch">
 
         {/* Ask Sakhi AI quick box */}
-        <div className="bg-gradient-to-br from-primary/8 via-white to-white rounded-3xl p-6 border border-primary/10 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4.5 h-4.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
+        <div className="bg-gradient-to-br from-primary/8 via-white to-white rounded-3xl p-6 border border-primary/10 shadow-sm flex flex-col justify-between h-full">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <svg className="w-4.5 h-4.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-accent">Ask Sakhi AI</p>
+                <p className="text-[10px] text-accent/40">Your personal menopause companion</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-bold text-accent">Ask Sakhi AI</p>
-              <p className="text-[10px] text-accent/40">Your personal menopause companion</p>
-            </div>
+            <form onSubmit={handleQuickChat}>
+              <input
+                type="text"
+                value={quickMessage}
+                onChange={(e) => setQuickMessage(e.target.value)}
+                placeholder="Ask anything about your symptoms..."
+                className="w-full px-4 py-3 rounded-2xl border border-primary/15 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm placeholder-accent/30 mb-3"
+              />
+              <button
+                type="submit"
+                className="w-full bg-primary text-white text-sm font-bold py-3 rounded-2xl hover:bg-opacity-90 active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Ask Sakhi →
+              </button>
+            </form>
           </div>
-          <form onSubmit={handleQuickChat}>
-            <input
-              type="text"
-              value={quickMessage}
-              onChange={(e) => setQuickMessage(e.target.value)}
-              placeholder="Ask anything about your symptoms..."
-              className="w-full px-4 py-3 rounded-2xl border border-primary/15 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm placeholder-accent/30 mb-3"
-            />
-            <button
-              type="submit"
-              className="w-full bg-primary text-white text-sm font-bold py-3 rounded-2xl hover:bg-opacity-90 active:scale-95 transition-all duration-200 cursor-pointer"
-            >
-              Ask Sakhi →
-            </button>
-          </form>
         </div>
 
         {/* Quick action cards */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 h-full">
           {[
             {
               to: '/doctor-summary',
-              icon: '📋',
               title: 'Doctor Summary',
-              desc: 'Generate a clinical report for your next appointment',
-              color: 'bg-violet-50 border-violet-100',
+              desc: 'Generate clinical report for appointments',
+              icon: (
+                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              ),
             },
             {
               to: '/workplace-letter',
-              icon: '💼',
               title: 'Workplace Letter',
-              desc: 'Draft an accommodation request for your employer',
-              color: 'bg-sky-50 border-sky-100',
+              desc: 'Draft accommodation request letters',
+              icon: (
+                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              ),
             },
             {
               to: '/trends',
-              icon: '📈',
               title: 'My Trends',
-              desc: 'View MRS score history and weekly charts',
-              color: 'bg-emerald-50 border-emerald-100',
+              desc: 'View MRS score history and charts',
+              icon: (
+                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              ),
             },
             {
               to: '/log-symptoms',
-              icon: '✏️',
               title: 'Log Symptoms',
               desc: 'Track today\'s menopause symptoms',
-              color: 'bg-amber-50 border-amber-100',
+              icon: (
+                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              ),
             },
           ].map((card) => (
             <Link
               key={card.to}
               to={card.to}
-              className={`${card.color} border rounded-2xl p-4 flex flex-col gap-2 hover:shadow-md transition-all duration-200 active:scale-95 cursor-pointer`}
+              className="bg-[#FAF0ED]/20 border border-primary/10 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md hover:bg-[#FAF0ED]/40 hover:border-primary/20 transition-all duration-200 active:scale-95 cursor-pointer h-full"
             >
-              <span className="text-xl">{card.icon}</span>
-              <p className="text-xs font-bold text-accent leading-tight">{card.title}</p>
-              <p className="text-[10px] text-accent/50 leading-relaxed">{card.desc}</p>
+              <div>
+                <div className="mb-2">{card.icon}</div>
+                <p className="text-xs font-bold text-accent leading-tight">{card.title}</p>
+              </div>
+              <p className="text-[10px] text-accent/50 leading-normal mt-1">{card.desc}</p>
             </Link>
           ))}
         </div>

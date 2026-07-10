@@ -103,3 +103,31 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"[{self.role}] {self.content[:40]}"
+
+
+class DoctorSummaryReport(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="doctor_summaries")
+    created_at = models.DateTimeField(auto_now_add=True)
+    mrs_score = models.FloatField()
+    content = models.TextField()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Summary Report for {self.user.email} on {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class WorkplaceLetter(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="workplace_letters")
+    created_at = models.DateTimeField(auto_now_add=True)
+    job_role = models.CharField(max_length=100, blank=True)
+    concerns = models.TextField(blank=True)
+    content = models.TextField()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        role_str = f" ({self.job_role})" if self.job_role else ""
+        return f"Workplace Letter{role_str} for {self.user.email} on {self.created_at.strftime('%Y-%m-%d')}"

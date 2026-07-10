@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import SymptomLog, ChatSession, ChatMessage
+from .models import SymptomLog, ChatSession, ChatMessage, DoctorSummaryReport, WorkplaceLetter
 
 User = get_user_model()
 
@@ -68,3 +68,15 @@ class ChatSessionSerializer(serializers.ModelSerializer):
     def get_last_message(self, obj):
         last = obj.messages.last()
         return last.content[:80] if last else ''
+
+
+class DoctorSummaryReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorSummaryReport
+        fields = ('id', 'created_at', 'mrs_score', 'content')
+
+
+class WorkplaceLetterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkplaceLetter
+        fields = ('id', 'created_at', 'job_role', 'concerns', 'content')
