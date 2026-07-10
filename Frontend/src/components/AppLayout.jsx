@@ -127,7 +127,7 @@ export default function AppLayout({ children }) {
           </div>
           <div>
             <span className="text-lg font-bold tracking-tight text-primary leading-none block">
-              Sakhi <span className="font-light">Pause</span>
+              Sakhi <span className="font-bold">Pause</span>
             </span>
             <span className="text-[9px] text-accent/40 uppercase tracking-widest font-bold">Menopause Companion</span>
           </div>
@@ -197,7 +197,7 @@ export default function AppLayout({ children }) {
               <span className="text-primary text-xs font-black">S</span>
             </div>
             <span className="text-base font-bold text-primary tracking-tight">
-              Sakhi <span className="font-light">Pause</span>
+              Sakhi <span className="font-bold">Pause</span>
             </span>
           </div>
           <button

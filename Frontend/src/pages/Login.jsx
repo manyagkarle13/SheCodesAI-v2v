@@ -34,7 +34,7 @@ export default function Login() {
 
       {/* HEADER / LOGO */}
       <header className="max-w-7xl mx-auto w-full px-6 md:px-12 py-6 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold tracking-tight text-primary">Sakhi</Link>
+        <Link to="/" className="text-2xl font-bold tracking-tight text-primary">Sakhi <span className="font-bold">Pause</span></Link>
         <Link to="/" className="text-sm font-semibold text-accent/80 hover:text-primary transition-colors">Back to home</Link>
       </header>
 

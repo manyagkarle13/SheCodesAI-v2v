@@ -83,7 +83,7 @@ function LandingPage() {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link to="/" className="text-2xl font-bold tracking-tight text-primary">
-              Sakhi <span className="font-light">Pause</span>
+              Sakhi <span className="font-bold">Pause</span>
             </Link>
           </div>
 
