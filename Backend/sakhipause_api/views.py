@@ -33,7 +33,16 @@ def register_user(request):
     """
     serializer = UserRegisterSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.save()
+        try:
+            user = serializer.save()
+        except Exception as e:
+            import traceback
+            return Response({
+                "status": "error",
+                "message": "Database/Save error occurred.",
+                "error_detail": str(e),
+                "traceback": traceback.format_exc()
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({
             "status": "success",
             "message": "User registered successfully.",
