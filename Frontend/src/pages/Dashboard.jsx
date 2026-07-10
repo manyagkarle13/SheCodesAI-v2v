@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SkeletonCard, { SkeletonBlock } from '../components/SkeletonCard'
+import API_URL from '../config/api'
 
 // Color palette for MRS classification
 const SCORE_STYLES = {
@@ -125,7 +126,7 @@ export default function Dashboard() {
     // Fetch MRS score
     const fetchScore = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/symptoms/mrs-score/`, {
+        const res = await fetch(`${API_URL}/symptoms/mrs-score/`, {
           headers: { Authorization: `Bearer ${token.access}` },
         })
         if (res.ok) {
@@ -149,7 +150,7 @@ export default function Dashboard() {
     // Fetch trends for mini sparkline
     const fetchTrends = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/symptoms/trends/`, {
+        const res = await fetch(`${API_URL}/symptoms/trends/`, {
           headers: { Authorization: `Bearer ${token.access}` },
         })
         if (res.ok) {

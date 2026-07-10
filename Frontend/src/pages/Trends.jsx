@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import SkeletonCard, { SkeletonBlock } from '../components/SkeletonCard'
+import API_URL from '../config/api'
 
 const SEVERITY_COLORS = {
   'None to little': 'text-emerald-700 bg-emerald-50 border-emerald-200/50',
@@ -171,7 +172,7 @@ export default function Trends() {
         const headers = { 'Authorization': `Bearer ${token?.access}` }
         
         // 1. Fetch latest score and trend
-        const scoreRes = await fetch(`${import.meta.env.VITE_API_URL}/symptoms/mrs-score/`, { headers })
+        const scoreRes = await fetch(`${API_URL}/symptoms/mrs-score/`, { headers })
         let scoreJson = null
         if (scoreRes.ok) {
           scoreJson = await scoreRes.json()
@@ -181,7 +182,7 @@ export default function Trends() {
         }
 
         // 2. Fetch weekly trend data
-        const trendsRes = await fetch(`${import.meta.env.VITE_API_URL}/symptoms/trends/`, { headers })
+        const trendsRes = await fetch(`${API_URL}/symptoms/trends/`, { headers })
         if (trendsRes.ok) {
           const trendsJson = await trendsRes.json()
           setTrends(trendsJson.trends || [])

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import API_URL from '../config/api'
 
 // Simple pure-React markdown text formatter for formatting paragraphs, bullets, and bold inline texts
 function FormattedText({ text }) {
@@ -101,7 +102,7 @@ export default function AskAI() {
   const fetchSessions = async (selectId = null) => {
     if (!token?.access) return
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat/sessions/`, {
+      const response = await fetch(`${API_URL}/chat/sessions/`, {
         headers: {
           'Authorization': `Bearer ${token.access}`,
         },
@@ -137,7 +138,7 @@ export default function AskAI() {
     setLoadingMessages(true)
     setError('')
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat/sessions/${sessionId}/messages/`, {
+      const response = await fetch(`${API_URL}/chat/sessions/${sessionId}/messages/`, {
         headers: {
           'Authorization': `Bearer ${token.access}`,
         },
@@ -173,7 +174,7 @@ export default function AskAI() {
     setLoadingMessages(true)
     setError('')
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat/sessions/`, {
+      const response = await fetch(`${API_URL}/chat/sessions/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +227,7 @@ export default function AskAI() {
         content: msg.content,
       }))
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat/ask/`, {
+      const response = await fetch(`${API_URL}/chat/ask/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -272,7 +273,7 @@ export default function AskAI() {
     if (!token?.access || !window.confirm('Are you sure you want to delete this chat session?')) return
     setError('')
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat/sessions/${sessionId}/delete/`, {
+      const response = await fetch(`${API_URL}/chat/sessions/${sessionId}/delete/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token.access}`,

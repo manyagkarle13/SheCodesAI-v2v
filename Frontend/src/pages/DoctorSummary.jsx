@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { jsPDF } from 'jspdf'
 import SkeletonCard, { SkeletonBlock } from '../components/SkeletonCard'
+import API_URL from '../config/api'
 
 export default function DoctorSummary() {
   const { user, token } = useAuth()
@@ -16,7 +17,7 @@ export default function DoctorSummary() {
   const fetchHistory = async () => {
     setLoadingHistory(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/summary/history/`, {
+      const response = await fetch(`${API_URL}/summary/history/`, {
         headers: {
           'Authorization': `Bearer ${token?.access}`,
         },
@@ -45,7 +46,7 @@ export default function DoctorSummary() {
     setSelectedReportId(null)
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/summary/doctor-report/`, {
+      const response = await fetch(`${API_URL}/summary/doctor-report/`, {
         headers: {
           'Authorization': `Bearer ${token?.access}`,
         },

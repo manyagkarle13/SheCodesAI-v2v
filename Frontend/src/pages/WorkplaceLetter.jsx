@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import SkeletonCard, { SkeletonBlock } from '../components/SkeletonCard'
+import API_URL from '../config/api'
 
 export default function WorkplaceLetter() {
   const { token } = useAuth()
@@ -18,7 +19,7 @@ export default function WorkplaceLetter() {
   const fetchHistory = async () => {
     setLoadingHistory(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/workplace/history/`, {
+      const response = await fetch(`${API_URL}/workplace/history/`, {
         headers: {
           'Authorization': `Bearer ${token?.access}`,
         },
@@ -49,7 +50,7 @@ export default function WorkplaceLetter() {
     setSelectedLetterId(null)
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/workplace/generate-letter/`, {
+      const response = await fetch(`${API_URL}/workplace/generate-letter/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

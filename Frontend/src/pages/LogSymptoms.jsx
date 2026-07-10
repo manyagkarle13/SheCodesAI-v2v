@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SkeletonCard from '../components/SkeletonCard'
+import API_URL from '../config/api'
 
 const SYMPTOM_CATEGORIES = [
   { key: 'hot_flashes_severity', label: 'Hot Flashes & Sweating', desc: 'Episodes of sudden warmth, sweating, or hot flashes.' },
@@ -52,7 +53,7 @@ export default function LogSymptoms() {
     const checkTodayLog = async () => {
       try {
         setError('')
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/symptoms/history/`, {
+        const res = await fetch(`${API_URL}/symptoms/history/`, {
           headers: { Authorization: `Bearer ${token.access}` },
         })
         if (res.ok) {
@@ -105,8 +106,8 @@ export default function LogSymptoms() {
     setIsSubmitting(true)
 
     const endpoint = isUpdateMode
-      ? `${import.meta.env.VITE_API_URL}/symptoms/log/update/`
-      : `${import.meta.env.VITE_API_URL}/symptoms/log/`
+      ? `${API_URL}/symptoms/log/update/`
+      : `${API_URL}/symptoms/log/`
     const method = isUpdateMode ? 'PATCH' : 'POST'
 
     try {
