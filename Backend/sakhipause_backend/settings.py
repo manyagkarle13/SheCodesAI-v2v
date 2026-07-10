@@ -126,6 +126,7 @@ AUTH_USER_MODEL = 'sakhipause_api.User'
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://sakhipause.netlify.app',
 ])
 
 # REST Framework Configuration

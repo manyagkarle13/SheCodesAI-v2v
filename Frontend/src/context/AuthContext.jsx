@@ -34,16 +34,20 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       })
     } catch (err) {
-      throw new Error('Connection failed. Please check your network and try again.')
+      throw new Error('Connection failed. The backend server might be starting up (this can take up to 50 seconds on Render\'s free tier). Please try again in a moment.')
     }
 
     if (!response.ok) {
       let errorMessage = 'Login failed. Please check your credentials.'
-      try {
-        const errorData = await response.json()
-        errorMessage = errorData.detail || errorData.message || errorMessage
-      } catch (e) {
-        // Fallback if response is not JSON
+      if (response.status >= 500) {
+        errorMessage = 'The backend server is starting up (this can take up to 50 seconds on Render\'s free tier). Please try again in a moment.'
+      } else {
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.detail || errorData.message || errorMessage
+        } catch (e) {
+          errorMessage = `Server error (${response.status}). The service might be booting up.`
+        }
       }
       throw new Error(errorMessage)
     }
@@ -77,20 +81,24 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(payload),
       })
     } catch (err) {
-      throw new Error('Connection failed. Please check your network and try again.')
+      throw new Error('Connection failed. The backend server might be starting up (this can take up to 50 seconds on Render\'s free tier). Please try again in a moment.')
     }
 
     if (!response.ok) {
       let errorMessage = 'Registration failed. Please check the form details.'
-      try {
-        const errorData = await response.json()
-        const errorKeys = Object.keys(errorData)
-        if (errorKeys.length > 0) {
-          const firstError = errorData[errorKeys[0]]
-          errorMessage = Array.isArray(firstError) ? firstError[0] : firstError
+      if (response.status >= 500) {
+        errorMessage = 'The backend server is starting up (this can take up to 50 seconds on Render\'s free tier). Please try again in a moment.'
+      } else {
+        try {
+          const errorData = await response.json()
+          const errorKeys = Object.keys(errorData)
+          if (errorKeys.length > 0) {
+            const firstError = errorData[errorKeys[0]]
+            errorMessage = Array.isArray(firstError) ? firstError[0] : firstError
+          }
+        } catch (e) {
+          errorMessage = `Server error (${response.status}). The service might be booting up.`
         }
-      } catch (e) {
-        // Fallback if response is not JSON
       }
       throw new Error(errorMessage)
     }
